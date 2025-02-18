@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name             Curse detector (ES)
+// @name             Curse detector
 // @namespace        mz-curse-detector
 // @description      Detect curses on MZ forum posts. Works winth spanish words only.
 // @description:es   Detectar groserías en los mensajes de los foros de MZ. Solamente detecta palabras en español.
@@ -7,7 +7,7 @@
 // @icon             https://www.managerzone.com/favicon.ico?v2
 // @include          https://*managerzone.*p=forum&sub=topic*
 // @grant            none
-// @version          0.1
+// @version          0.2
 // @copyright        GNU/GPL v3
 // @author           rhonaldomaster
 // @license          GPL-3.0-or-later
@@ -16,6 +16,8 @@
 // @compatible       opera
 // @compatible       safari
 // @compatible       edge
+// @downloadURL      https://update.greasyfork.org/scripts/515121/Curse%20detector.user.js
+// @updateURL        https://update.greasyfork.org/scripts/515121/Curse%20detector.meta.js
 // ==/UserScript==
 
 const curseDictionary = [
@@ -41,10 +43,14 @@ const curseDictionary = [
 ];
 
 function searchAndHighlightWord(word, textContainer) {
-  const warningColor = '#ff4800';
+  const warningColor = 'var(--curseColor)';
   const originalText = textContainer.innerHTML;
-  const regex = new RegExp(`(${word})`, 'gi');
-  const highlightedText = originalText.replace(regex, `<span style="color: ${warningColor}; font-weight: bold; text-decoration: underline;">$1</span>`);
+  if (originalText.indexOf(`<span style="color:${warningColor};font-weight:bold;text-decoration:underline;">`) > -1) {
+    return;
+  }
+
+  const regex = new RegExp(`([^>]${word})`, 'gi');
+  const highlightedText = originalText.replace(regex, `<span style="color:${warningColor};font-weight:bold;text-decoration:underline;">$1</span>`);
 
   if (highlightedText !== originalText) {
     textContainer.innerHTML = highlightedText;
@@ -65,12 +71,16 @@ function detectCurses() {
   });
 }
 
+function addCSSVariables() {
+  const root = document.querySelector(':root');
+  root.style.setProperty('--curseColor', '#ff4800');
+}
+
 const observer = new MutationObserver((mutations) => {
   mutations.forEach(mutation => {
     if (mutation.type === 'childList') {
       mutation.addedNodes.forEach(node => {
         if (node.nodeType === 1 && node.classList.contains('forum-post-content')) {
-          console.log('New post detected:', node);
           detectCurses(node);
         }
       });
@@ -85,6 +95,7 @@ if (postsContainer) {
 }
 
 if (postsContainer) {
+  addCSSVariables();
   observer.observe(postsContainer, { childList: true, subtree: true });
 } else {
   console.error('Posts container not found.');
