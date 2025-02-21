@@ -7,7 +7,7 @@
 // @icon             https://www.managerzone.com/favicon.ico?v2
 // @include          https://*managerzone.*p=forum&sub=topic*
 // @grant            none
-// @version          0.2
+// @version          0.3
 // @copyright        GNU/GPL v3
 // @author           rhonaldomaster
 // @license          GPL-3.0-or-later
@@ -21,25 +21,97 @@
 // ==/UserScript==
 
 const curseDictionary = [
-  'boba', 'bobo', 'boluda', 'bolu.da', 'boludo', 'bolu.do',
-  'bosta', 'bostera', 'bostero', 'burrazo', 'burro',
-  'cometrava', 'cometraba', 'concha', ' culo',
-  'estupida', 'estúpida', 'estupido', 'estúpido',
-  'gil', 'gilipolla', 'gonorrea',
-  'hdp', 'hipocrita', 'hipócrita', 'hijo de puta', 'hitler',
-  'idiota', 'imbecil', 'imbécil',
-  'kkk', 'kuka',
-  'lacra', 'la tenés adentro', 'la tenes adentro', 'la tenes bien adentro',
-  'la tenés bien adentro', 'la tenéis bien adentro', ' lta',
-  'malcogida', 'malcogido', 'mal cogida', 'mal cogido', 'malparida', 'malparido',
-  'mal parida', 'mal parido', 'marica', 'mediocre', 'mierda',
-  'miserable', 'mogolico', 'mogólico', 'montonero', 'mu ', 'muerde almohada', 'muerdealmohada',
+  'boba',
+  'bobo',
+  'boluda',
+  'bolu.da',
+  'boludo',
+  'bolu.do',
+  'bosta',
+  'bostera',
+  'bostero',
+  'burrazo',
+  'burro',
+  'cometrava',
+  'cometraba',
+  'concha',
+  ' culo',
+  'estupida',
+  'estúpida',
+  'estupido',
+  'estúpido',
+  'gil',
+  'gilipolla',
+  'gonorrea',
+  'hdp',
+  'hipocrita',
+  'hipócrita',
+  'hijo de puta',
+  'hitler',
+  'idiota',
+  'imbecil',
+  'imbécil',
+  'kkk',
+  'kuka',
+  'lacra',
+  'la tenés adentro',
+  'la tenes adentro',
+  'la tenes bien adentro',
+  'la tenés bien adentro',
+  'la tenéis bien adentro',
+  ' lta',
+  'malcogida',
+  'malcogido',
+  'mal cogida',
+  'mal cogido',
+  'malparida',
+  'malparido',
+  'mal parida',
+  'mal parido',
+  'marica',
+  'mediocre',
+  'mierda',
+  'miserable',
+  'mogolico',
+  'mogólico',
+  'montonero',
+  'mu ',
+  'muerde almohada',
+  'muerdealmohada',
   'negro cabeza',
-  'patetico', 'patético', 'payasa', 'payaso', 'pelotuda', 'pelotudo', 'pene', 'perra', 'puta', 'putear', 'puto',
-  'retrasada', 'retrasado', 'ridicula' , 'ridícula', 'ridiculo', 'ridículo',
-  'salame', 'sorete', 'sucio', 'subnormal',
-  'tarada', 'tarado', 'tonta', 'tontaza', 'tontazo', 'tonto', 'trampa', 'tramposa', 'tramposo',
-  'vende ajo', 'vendo ajo', 'verduler',
+  'patetico',
+  'patético',
+  'payasa',
+  'payaso',
+  'pelotuda',
+  'pelotudo',
+  'pene',
+  'perra',
+  'puta',
+  'putear',
+  'puto',
+  'retrasada',
+  'retrasado',
+  'ridicula',
+  'ridícula',
+  'ridiculo',
+  'ridículo',
+  'salame',
+  'sorete',
+  'sucio',
+  'subnormal',
+  'tarada',
+  'tarado',
+  'tonta',
+  'tontaza',
+  'tontazo',
+  'tonto',
+  'trampa',
+  'tramposa',
+  'tramposo',
+  'vende ajo',
+  'vendo ajo',
+  'verduler',
 ];
 
 function searchAndHighlightWord(word, textContainer) {
@@ -49,8 +121,11 @@ function searchAndHighlightWord(word, textContainer) {
     return;
   }
 
-  const regex = new RegExp(`([^>]${word})`, 'gi');
-  const highlightedText = originalText.replace(regex, `<span style="color:${warningColor};font-weight:bold;text-decoration:underline;">$1</span>`);
+  const regex = new RegExp(`\\b${word}\\b`, 'gi');
+  const highlightedText = originalText.replace(
+    regex,
+    `<span style="color:${warningColor};font-weight:bold;text-decoration:underline;">$&</span>`
+  );
 
   if (highlightedText !== originalText) {
     textContainer.innerHTML = highlightedText;
@@ -76,7 +151,7 @@ function addCSSVariables() {
   root.style.setProperty('--curseColor', '#ff4800');
 }
 
-const observer = new MutationObserver((mutations) => {
+const observer = new MutationObserver(mutations => {
   mutations.forEach(mutation => {
     if (mutation.type === 'childList') {
       mutation.addedNodes.forEach(node => {
